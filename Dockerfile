@@ -26,7 +26,7 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 RUN apt-get update && apt-get install -y maven && apt-get clean
 
 # Install Python deps
-RUN pip install --no-cache-dir pyserini==0.44.0
+RUN pip install --no-cache-dir pyserini==0.44.0 fastapi uvicorn
 
 RUN git clone https://github.com/castorini/anserini.git && cd anserini
 #  && mvn clean package appassembler:assemble
@@ -35,4 +35,9 @@ RUN git clone https://github.com/castorini/anserini.git && cd anserini
 WORKDIR /app
 COPY . /app
 
-CMD ["bash"]
+CMD ["uvicorn", "pyserini_search_api:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# To run docker
+# go to the project root, open a terminal, do
+# 1. docker build -t jeeves-pyserini-api .
+# 2. docker run -p 8000:8000 -v $PWD/indexes/sample_collection_jsonl:/index jeeves-pyserini-api
